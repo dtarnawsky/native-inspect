@@ -36,7 +36,7 @@ export const process = async (options) => {
     run('rm -rf plugins');
     run('rm -rf platforms');
     run('npm install');
-    run(`ionic cordova plugin add ${options.plugin}`);
+    run(`ionic cordova plugin add ${options.plugin}`, 'pluginExists');
     for (const command of options.commands) {
       run(command);
     }
