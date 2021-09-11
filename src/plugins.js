@@ -10,6 +10,8 @@ export const processPlugins = (plugins) => {
             plugin: plugin.cordovaPlugin.name, // eg 'cordova-plugin-3dtouch',
             projectName: 'cordova-android-10',
             projectFolder: '../cs-ionic-native-test/proj-cordova-android-10',
+            android: plugin.platforms.includes('Android'),
+            ios: plugin.platforms.includes('iOS'),
             commands: [`npm install ${plugin.packageName}`]
         };
 

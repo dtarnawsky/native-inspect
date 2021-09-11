@@ -40,8 +40,12 @@ export const process = async (options) => {
     for (const command of options.commands) {
       run(command);
     }
-    run('ionic cordova build android', 'android');
-    run('ionic cordova build ios', 'ios');
+    if (options.android) {
+      run('ionic cordova build android', 'android');
+    }
+    if (options.ios) {
+      run('ionic cordova build ios', 'ios');
+    }
   } finally {
 
   }
