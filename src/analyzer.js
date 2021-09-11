@@ -20,7 +20,7 @@ export const process = async (options) => {
         }
       } catch (error) {
         failed('Failed');
-        writeFailure(options, command, error.stderr.toString());
+        writeFailure(options, command.stdout.toString() + '\n' + command, error.stderr.toString());
         writeResult(options, test, false);
         throw new Error('Command ' + command + ' Failed');
       }
@@ -36,15 +36,26 @@ export const process = async (options) => {
     run('rm -rf plugins');
     run('rm -rf platforms');
     run('npm install');
-    run(`ionic cordova plugin add ${options.plugin}`, 'pluginExists');
+    if (options.isCordova) {
+      run(`ionic cordova plugin add ${options.plugin}`, 'pluginExists');
+    }
+    if (options.isCapacitor) {
+      run(`npm install ${options.plugin}`, 'pluginExists');
+    }
     for (const command of options.commands) {
       run(command);
     }
-    if (options.android) {
-      run('ionic cordova build android', 'android');
+    if (options.isCordova) {
+      if (options.android) {
+        run('ionic cordova build android', 'android');
+      }
+      if (options.ios) {
+        run('ionic cordova build ios', 'ios');
+      }
     }
-    if (options.ios) {
-      run('ionic cordova build ios', 'ios');
+    if (options.isCapacitor) {
+      run('npm run build', 'builds');
+      run('npx cap sync', 'capacitorSync');
     }
   } finally {
 

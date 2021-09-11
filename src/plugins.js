@@ -12,11 +12,18 @@ export const processPlugins = (plugins) => {
             projectFolder: '../cs-ionic-native-test/proj-cordova-android-10',
             android: plugin.platforms.includes('Android'),
             ios: plugin.platforms.includes('iOS'),
+            isCordova: true,
+            isCapacitor: false,
             commands: [`npm install ${plugin.packageName}`]
         };
 
         // TODO: Pull in the project from github locally
-        let project = '../cs-ionic-native-test/proj-cordova-android-10';
+        process(options);
+
+        options.projectName = 'capacitor';
+        options.projectFolder = '../cs-ionic-native-test/proj-capacitor';
+        options.isCapacitor = true;
+        options.isCordova = false;
         process(options);
     }
 }
