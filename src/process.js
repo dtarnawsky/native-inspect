@@ -7,33 +7,33 @@ import { execSync } from 'child_process';
 let xcodeBuildDestination;
 
 export const process = async (options) => {
-  try {
-    const run = (command, test, folder) => {
-      write(command);
-      let log;
-      try {
-        const cwd = (folder) ? folder : options.projectFolder;
-        log = execSync(command, { cwd: cwd });
-        ok('Success');
-        if (options.verbose) {
-          write(log);
-        }
-        if (test) {
-          writeResult(options, test, true);
-        }
-      } catch (error) {
-        failed('Failed');
-        writeFailure(options, error.stdout.toString() + '\n' + command, error.stderr.toString());
-        writeResult(options, test, false);
-        throw new Error('Command ' + command + ' Failed');
+  const run = (command, test, folder) => {
+    write(command);
+    let log;
+    try {
+      const cwd = (folder) ? folder : options.projectFolder;
+      log = execSync(command, { cwd: cwd });
+      ok('Success');
+      if (options.verbose) {
+        write(log);
       }
+      if (test) {
+        writeResult(options, test, true);
+      }
+    } catch (error) {
+      failed('Failed');
+      writeFailure(options, error.stdout.toString() + '\n' + command, error.stderr.toString());
+      writeResult(options, test, false);
+      throw new Error('Command ' + command + ' Failed');
     }
+  }
 
-    if (!fs.existsSync(options.projectFolder)) {
-      error(`Path does not exist ${options.projectFolder}`);
-      throw new Error('Path does not exist: ' + options.projectFolder);
-    }
+  if (!fs.existsSync(options.projectFolder)) {
+    error(`Path does not exist ${options.projectFolder}`);
+    throw new Error('Path does not exist: ' + options.projectFolder);
+  }
 
+  try {
     run('git clean -fdx');
     run('git restore .');
     run('rm -rf plugins');
@@ -67,12 +67,10 @@ export const process = async (options) => {
         run(`xcodebuild -workspace App.xcworkspace -scheme App -destination "${xcodeBuildDestination}"`, 'ios', options.projectFolder + '/ios/App');
       }
       if (options.android) {
-        warn('Capacitor android build not implemented yet for ' + options.plugin);
+        run('./gradlew', 'android', options.projectFolder + '/android');
       }
     }
-  } finally {
-
-  }
+  } finally { }
 };
 
 const listPlatforms = (text) => {
