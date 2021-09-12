@@ -1,7 +1,7 @@
 'use strict';
 
 import * as fs from 'fs';
-import { error, failed, ok, write } from './logging';
+import { error, failed, ok, write, writeLn } from './logging';
 import { execSync } from 'child_process';
 
 export const process = async (options) => {
@@ -20,7 +20,7 @@ export const process = async (options) => {
         }
       } catch (error) {
         failed('Failed');
-        writeFailure(options, command.stdout.toString() + '\n' + command, error.stderr.toString());
+        writeFailure(options, error.stdout.toString() + '\n' + command, error.stderr.toString());
         writeResult(options, test, false);
         throw new Error('Command ' + command + ' Failed');
       }
@@ -56,11 +56,41 @@ export const process = async (options) => {
     if (options.isCapacitor) {
       run('npm run build', 'builds');
       run('npx cap sync', 'capacitorSync');
+      prepareBuild(options);
     }
   } finally {
 
   }
 };
+
+const listPlatforms = (text) => {
+  const lines = text.split('\n');
+  let result = '[';
+  for (const line of lines) {
+    if (line.includes('Ineligible')) {
+      break;
+    }
+    if (line.includes('{ platform')) {
+      //console.log(line);
+      let device = line.replace(/:/g,'":"');
+      device = device.replace(/, /g,'", "');
+      device = device.replace(' }', '"}');
+      device = device.replace('{ ', '{"');
+      device = device.trim();
+      result += device +',';
+      console.log(device);
+    }
+  }
+  return JSON.parse(result.substring(0, result.length-1)+']');
+}
+
+const prepareBuild = (options) => {
+  const folder = options.projectFolder + '/ios/App';
+  const log = execSync('xcodebuild -workspace App.xcworkspace -scheme App -showdestinations', {cwd: folder});
+  const devices = listPlatforms(log.toString());
+  // devices has { platform: 'iOS Simulator', id: 'guid', OS: '14.5', name: 'iPad (8th Generation)' }
+  writeLn(devices);
+}
 
 const writeResult = (options, test, success) => {
   let result = loadResults();
@@ -82,7 +112,7 @@ const writeFailure = (options, command, log) => {
   fs.writeFileSync(filename, data);
 }
 
-const loadResults = () => {
+export const loadResults = () => {
   if (fs.existsSync(resultFileName)) {
     const json = fs.readFileSync(resultFileName);
     return JSON.parse(json);

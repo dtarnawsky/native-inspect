@@ -1,10 +1,17 @@
 'use strict';
 
-import { process } from './analyzer';
+import { process, loadResults } from './analyzer';
+import { error, writeLn } from './logging';
+
+const validName = (name) => {
+    if (name.includes('//')) return false;
+    return true;
+}
 
 export const processPlugins = (plugins) => {
+    const result = loadResults();
     for (const plugin of plugins) {
-
+        const isValidPlugin = validName(plugin.cordovaPlugin.name);
         let options = {
             verbose: false,
             plugin: plugin.cordovaPlugin.name, // eg 'cordova-plugin-3dtouch',
@@ -18,12 +25,21 @@ export const processPlugins = (plugins) => {
         };
 
         // TODO: Pull in the project from github locally
-        process(options);
 
-        options.projectName = 'capacitor';
-        options.projectFolder = '../cs-ionic-native-test/proj-capacitor';
-        options.isCapacitor = true;
-        options.isCordova = false;
-        process(options);
+        if (isValidPlugin && !result[plugin.cordovaPlugin.name]) {
+            process(options);
+
+            options.projectName = 'capacitor';
+            options.projectFolder = '../cs-ionic-native-test/proj-capacitor';
+            options.isCapacitor = true;
+            options.isCordova = false;
+            process(options);
+        } else {
+            if (isValidPlugin) {
+                writeLn('Already processed ' + plugin.cordovaPlugin.name);
+            } else {
+                error(`Invalid plugin name '${plugin.cordovaPlugin.name}'`);
+            }
+        }
     }
 }
