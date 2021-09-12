@@ -1,7 +1,7 @@
 'use strict';
 
 import * as fs from 'fs';
-import { error, failed, ok, write, writeLn } from './logging';
+import { error, failed, ok, warn, write, writeLn } from './logging';
 import { execSync } from 'child_process';
 
 let xcodeBuildDestination;
@@ -56,11 +56,19 @@ export const process = async (options) => {
         run('ionic cordova build ios', 'ios');
       }
     }
+  } finally { }
+
+  try {
     if (options.isCapacitor) {
       run('npm run build', 'builds');
       run('npx cap sync', 'capacitorSync');
-      prepareBuild(options);
-      run(`xcodebuild -workspace App.xcworkspace -scheme App -destination "${xcodeBuildDestination}"`, 'ios', options.projectFolder + '/ios/App');
+      if (options.ios) {
+        prepareBuild(options);
+        run(`xcodebuild -workspace App.xcworkspace -scheme App -destination "${xcodeBuildDestination}"`, 'ios', options.projectFolder + '/ios/App');
+      }
+      if (options.android) {
+        warn('Capacitor android build not implemented yet for ' + options.plugin);
+      }
     }
   } finally {
 
@@ -98,7 +106,7 @@ const prepareBuild = (options) => {
 const writeResult = (options, test, success) => {
   let result = loadResults();
   if (!result[options.plugin]) {
-    result[options.plugin] = {};
+    result[options.plugin] = { name: options.name };
   }
   let res = result[options.plugin][options.projectName];
   if (!res) res = {};

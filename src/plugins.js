@@ -2,6 +2,7 @@
 
 import { process, loadResults } from './process';
 import { error, writeLn } from './logging';
+import { writeHtml } from './pretty.mjs';
 
 const validName = (name) => {
     if (name.includes('//')) return false;
@@ -14,6 +15,7 @@ export const processPlugins = (plugins) => {
         const isValidPlugin = validName(plugin.cordovaPlugin.name);
         let options = {
             verbose: false,
+            name: plugin.displayName,
             plugin: plugin.cordovaPlugin.name, // eg cordova-plugin-3dtouch
             android: plugin.platforms.includes('Android'),
             ios: plugin.platforms.includes('iOS'),
@@ -43,5 +45,6 @@ export const processPlugins = (plugins) => {
                 error(`Invalid plugin name '${plugin.cordovaPlugin.name}'`);
             }
         }
+        writeHtml();
     }
 }
