@@ -1,6 +1,6 @@
 'use strict';
 
-import { process, loadResults } from './analyzer';
+import { process, loadResults } from './process';
 import { error, writeLn } from './logging';
 
 const validName = (name) => {
@@ -14,25 +14,27 @@ export const processPlugins = (plugins) => {
         const isValidPlugin = validName(plugin.cordovaPlugin.name);
         let options = {
             verbose: false,
-            plugin: plugin.cordovaPlugin.name, // eg 'cordova-plugin-3dtouch',
-            projectName: 'cordova-android-10',
-            projectFolder: '../cs-ionic-native-test/proj-cordova-android-10',
+            plugin: plugin.cordovaPlugin.name, // eg cordova-plugin-3dtouch
             android: plugin.platforms.includes('Android'),
             ios: plugin.platforms.includes('iOS'),
-            isCordova: true,
-            isCapacitor: false,
             commands: [`npm install ${plugin.packageName}`]
         };
 
         // TODO: Pull in the project from github locally
 
         if (isValidPlugin && !result[plugin.cordovaPlugin.name]) {
-            process(options);
+//            process(options);
 
             options.projectName = 'capacitor';
             options.projectFolder = '../cs-ionic-native-test/proj-capacitor';
             options.isCapacitor = true;
             options.isCordova = false;
+            process(options);
+
+            options.projectName = 'cordova-android-10';
+            options.projectFolder = '../cs-ionic-native-test/proj-cordova-android-10';
+            options.isCordova = true;
+            options.isCapacitor = false;
             process(options);
         } else {
             if (isValidPlugin) {
