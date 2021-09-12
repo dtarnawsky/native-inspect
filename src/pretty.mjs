@@ -40,10 +40,10 @@ export const writeHtml = () => {
         const plugin = results[name];
         html += `<ion-item><ion-label>${plugin.name}<p>${name}</p></ion-label><ion-buttons slot="end">`;
         checkMark(plugin.capacitor.pluginExists, 'Exists');
-        checkMark(plugin.capacitor.ios, 'Capacitor iOS');
-        checkMark(plugin.capacitor.ios, 'Capacitor Android');
-        checkMark(plugin['cordova-android-10']?.android, 'Cordova Android');
-        checkMark(plugin['cordova-android-10']?.ios, 'Cordova iOS');
+        checkMark(plugin.capacitor?.ios, 'Capacitor iOS');
+        checkMark(plugin.capacitor?.ios, 'Capacitor Android');
+        checkMark(plugin.cordova?.ios, 'Cordova iOS');
+        checkMark(plugin.cordova?.android, 'Cordova Android');
         html += `</ion-buttons></ion-item>`;
     }
 

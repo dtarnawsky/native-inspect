@@ -33,7 +33,7 @@ export const processPlugins = (plugins) => {
             options.isCordova = false;
             process(options);
 
-            options.projectName = 'cordova-android-10';
+            options.projectName = 'cordova';
             options.projectFolder = '../cs-ionic-native-test/proj-cordova-android-10';
             options.isCordova = true;
             options.isCapacitor = false;
